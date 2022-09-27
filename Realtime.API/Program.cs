@@ -1,44 +1,39 @@
-using Realtime.API.Entities;
+using Realtime.API.Extensions;
 using Realtime.API.Services;
 
-namespace Realtime.API;
-
-public static class Program
-{
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-        builder.Services.AddControllers();
+builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-        builder.Services.AddSignalR();
-        builder.Services.AddScoped<LocationHub>();
+builder.Services.AddMongo(builder.Configuration);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<LocationHub>();
+var service = builder.Services.BuildServiceProvider().GetRequiredService<MongoExtension>();
+service.MessageSeed();
 
-        var app = builder.Build();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        app.UseCors(corsPolicyBuilder => corsPolicyBuilder
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
-        app.UseAuthentication();
-        app.UseHttpsRedirection();
-        app.UseCors("CorsPolicy");
-        app.UseAuthorization();
-        app.MapHub<LocationHub>("/location");
-        app.MapControllers();
-
-        app.Run();
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseCors(corsPolicyBuilder => corsPolicyBuilder
+    .WithOrigins("http://localhost:4200")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
+app.UseAuthentication();
+app.UseHttpsRedirection();
+app.UseCors("CorsPolicy");
+app.UseAuthorization();
+app.MapHub<LocationHub>("/location");
+app.MapControllers();
+
+app.Run();
