@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Realtime.API.Entities;
 
 namespace Realtime.API.Services;
 
-public interface ILocationHubService
+public class LocationHub : Hub
 {
-    Task GetLocation(string lat, string lon);
-}
+    private readonly IHubContext<LocationHub> _context;
 
-public class LocationHub : Hub<ILocationHubService>
-{
-    
+    public LocationHub(IHubContext<LocationHub> context)
+    {
+        _context = context;
+    }
+    public async Task SetLocation(Coordinates coordinates)
+    {
+        await _context.Clients.All.SendAsync("GetLocation", coordinates);
+    }
 }

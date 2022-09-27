@@ -1,6 +1,6 @@
 ﻿export const CONFIGURATION = {
   baseUrls: {
-    server: 'http://localhost:5001/api/location',
+    server: 'https://localhost:5000/location',
     apiUrl: 'api/'
   }
 }

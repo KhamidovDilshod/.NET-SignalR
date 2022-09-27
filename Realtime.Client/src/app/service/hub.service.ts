@@ -4,6 +4,7 @@ import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 import {Subject} from "rxjs";
 import {Coordinate} from "../models/coordinate";
 import {CONFIGURATION} from "../constants/configuration";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root'
@@ -13,22 +14,21 @@ export class HubService {
   connectionEstablished$ = new Subject<Boolean>();
   locationCoordinates$ = new Subject<Coordinate>()
 
-  constructor() {
+  constructor(private http: HttpClient) {
   }
 
   public connect(): void {
-    if (this.connection) {
-      this.connection = new HubConnectionBuilder().withUrl(CONFIGURATION.baseUrls.server).build();
-      this.connection.start().then(() => {
-        console.log('Connection started')
-        this.connectionEstablished$.next(true);
-      }).catch(err => console.log(err));
+    this.connection = new HubConnectionBuilder().withUrl(CONFIGURATION.baseUrls.server).build();
+    this.connection.start().then(() => {
+      console.log('Connection started')
+      this.connectionEstablished$.next(true);
+    }).catch(err => console.log(err));
 
-      this.connection.on('GetLocation', (latitude, longitude) => {
-        console.log(`Received  ${latitude}-${longitude}`);
-        this.locationCoordinates$.next({latitude, longitude})
-      })
-    }
+    this.connection.on('GetLocation', (res) => {
+      console.log(res.latitude);
+      console.log(`Received  ${res.latitude}-${res.longitude}`);
+      this.locationCoordinates$.next({latitude: res.latitude, longitude: res.longitude})
+    })
   }
 
   public disconnect() {

@@ -5,25 +5,25 @@ using Realtime.API.Services;
 
 namespace Realtime.API.Controllers;
 
-[ApiController]
 [Produces("application/json")]
-[Route("api/[controller]")]
+[Route("api")]
+[ApiController]
 public class LocationController : ControllerBase
 {
-    private readonly IHubContext<LocationHub, ILocationHubService> _hubContext;
+    private readonly LocationHub _hub;
 
-    public LocationController(IHubContext<LocationHub, ILocationHubService> hubContext)
+    public LocationController(LocationHub hub)
     {
-        _hubContext = hubContext;
+        _hub = hub;
     }
 
     [HttpPost]
-    public string Post([FromBody] Coordinates coordinates)
+    public async Task<string> Post([FromBody] Coordinates coordinates)
     {
         string retMessage;
         try
         {
-            _hubContext.Clients.All.GetLocation(coordinates.Latitude, coordinates.Longitude);
+            await _hub.SetLocation(coordinates);
             retMessage = "Success";
         }
         catch (Exception e)
@@ -34,6 +34,7 @@ public class LocationController : ControllerBase
         return retMessage;
     }
 
+    //Use this Get method to test if the route is working by viewing the response
     [HttpGet]
     public ActionResult<IEnumerable<string>> Get()
     {

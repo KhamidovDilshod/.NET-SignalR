@@ -1,1 +1,3 @@
-<p> Location {{longitude}}-{{latitude}}</p>
+<ng-container *ngFor="let m of messages">
+  <p> Location {{m.longitude}}-{{m.latitude}}</p>
+</ng-container>

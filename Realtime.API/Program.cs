@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.SignalR;
+using Realtime.API.Entities;
 using Realtime.API.Services;
 
-public class Program
+namespace Realtime.API;
+
+public static class Program
 {
     public static void Main(string[] args)
     {
@@ -14,6 +16,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddSignalR();
+        builder.Services.AddScoped<LocationHub>();
 
         var app = builder.Build();
 
